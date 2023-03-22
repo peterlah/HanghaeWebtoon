@@ -23,8 +23,16 @@ def register_post():
     pw_register_receive = request.form.get('password')
     pw_check_receive = request.form.get('re_password')
 
+    # 디비에서 해당 아이디의 사용자 정보를 조회
+    user = db.user.find_one({'username': user_register_receive})
+
+    # 패스워드 검사
     if pw_register_receive != pw_check_receive:
         return jsonify({'msg': '비밀번호가 일치하지 않습니다.'})
+
+    # 아이디 존재 여부 확인
+    if user is not None:
+        return jsonify({'msg': '존재하는 아이디 입니다.'})
 
     doc = {
         'username': user_register_receive,
