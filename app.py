@@ -33,7 +33,6 @@ def home():
 
 ###### 우상님 작성 내용 ######
 @app.route("/webtoon", methods=["GET", "POST"])
-
 def webtoon_get():
     webtoon = list(db.webtoon_list.find())
     return jsonify({'result' : dumps(webtoon)})
@@ -117,36 +116,36 @@ def login_get():
     return render_template('login.html')
     
 ##### 보슬님 작성 내용 #####
-# /webtoon -> /mypage로 수정, 함수명 변경
-@app.route("/mypage", methods=["POST"])
-def mypage_post():
-    url_receive = request.form['url_give']
-    comment_receive = request.form['comment_give']
+# # /webtoon -> /mypage로 수정, 함수명 변경
+# @app.route("/mypage", methods=["POST"])
+# def mypage_post():
+#     url_receive = request.form['url_give']
+#     comment_receive = request.form['comment_give']
     
-    headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
-    data = requests.get(url_receive,headers=headers)
+#     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+#     data = requests.get(url_receive,headers=headers)
 
-    soup = BeautifulSoup(data.text, 'html.parser')
+#     soup = BeautifulSoup(data.text, 'html.parser')
 
-    ogtitle = soup.select_one('meta[property="og:title"]')['content']
-    ogdesc = soup.select_one('meta[property="og:description"]')['content']
-    ogimage = soup.select_one('meta[property="og:image"]')['content']
+#     ogtitle = soup.select_one('meta[property="og:title"]')['content']
+#     ogdesc = soup.select_one('meta[property="og:description"]')['content']
+#     ogimage = soup.select_one('meta[property="og:image"]')['content']
   
-    doc = {
-        'title':ogtitle,
-        'desc':ogdesc,
-        'image':ogimage,
-        'comment':comment_receive,
-    }
-    # collection 명 수정(webtoon->mywebtoon)
-    db.mywebtoon.insert_one(doc)
+#     doc = {
+#         'title':ogtitle,
+#         'desc':ogdesc,
+#         'image':ogimage,
+#         'comment':comment_receive,
+#     }
+#     # collection 명 수정(webtoon->mywebtoon)
+#     db.mywebtoon.insert_one(doc)
             
-    return jsonify({'msg':'POST 등록완료!'})
+#     return jsonify({'msg':'POST 등록완료!'})
 
-# /webtoon -> /mypage로 수정, 함수명 
-@app.route("/mypage", methods=["GET"])
-def mypage_get():
-    return jsonify({'msg':'GET 연결 완료!'})
+# # /webtoon -> /mypage로 수정, 함수명 
+# @app.route("/mypage", methods=["GET"])
+# def mypage_get():
+#     return jsonify({'msg':'GET 연결 완료!'})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)

@@ -8,112 +8,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    
-    # 리펙토링 필요
-    <style>        
-        .mytitle>.search-box {
-            margin-top: 30px;
-        }
-        
-        .mytitle>.search-box>input[type=text] {
-            width: 200px;
-            height: 50px;
-            text-align: center;
-            background-color: transparent;
-            color: white;
-            border-radius: 50px;
-            border: 1px solid white;
-        }
-        
-        .mytitle>.search-box>button {
-            width: 105px;
-            height: 50px;
-            text-align: center;
-            background-color: transparent;
-            color: white;
-            border-radius: 50px;
-            border: 1px solid white;
-        }
-        
-        .mytitle>.search-box>button:hover {
-            border: 2px solid white;
-        }
-        
-        .mycomment {
-            color: gray;
-        }
-        
-        .mycards {
-            margin: 20px auto 0px auto;
-            width: 95%;
-            max-width: 1200px;
-        }
-        
-        .mycards>div>div>div:hover {
-            border: 1px solid black;
-        }
-        
-        .mypost {
-            width: 95%;
-            max-width: 500px;
-            margin: 20px auto 0px auto;
-            padding: 20px;
-            box-shadow: 0px 0px 3px 0px gray;
-            display: none;
-        }
-        
-        .mybtns {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        
-        .mybtns>button {
-            margin-right: 10px;
-        }
-        
-        .modal_frame {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            left: 0;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(1.5px);
-            -webkit-backdrop-filter: blur(1.5px);
-            display: none;
-        }
-        
-        .modal_window {
-            background: white;
-            backdrop-filter: blur(13.5px);
-            -webkit-backdrop-filter: blur(13.5px);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            width: 400px;
-            height: 600px;
-            text-align: center;
-            position: relative;
-            padding: 10px;
-        }
-        
-        .modal_window>div.modal_innerimg {
-            height: 300px;
-            background-position: center;
-            background-size: cover;
-        }
-    </style>
 
     <!-- 스타일시트, javascript 적용 -->
     <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
     <script type=text/javascript src="{{ url_for('static', filename='js/listing.js') }}"></script>
     <script type=text/javascript src="{{ url_for('static', filename='js/webtoondetail.js') }}"></script>
+    <script type=text/javascript src="{{ url_for('static', filename='js/search.js') }}"></script>
 
     <title>웹투너</title>
 
@@ -122,121 +22,31 @@
             listing();
         });
 
+        // function open_box() {
+        //     $('#post-box').show()
+        // } // function open_box() end
 
-        # 리펙토링 필요
-        function webtoon_detail(id) {
-            fetch(`/detail/${id}`).then((res) => res.json()).then((data) => {
-                let one_webtoon = JSON.parse(data['result']);
-                let select_title = one_webtoon['title'];
-                let select_des = one_webtoon['description'];
-                let select_img = one_webtoon['image_source'];
-
-                let scroll = document.documentElement.scrollTop;
-                let window = `
-                            <div class="modal_window">
-                                <div class='modal_innerimg' style = "background-image : url('${select_img}')"";>
-                                </div>
-                                <h5> ${select_title} </h5>
-                                <p> ${select_des} <p>
-                            </div>`
-                console.log(scroll)
-                $('#modal_frame').append(window)
-                let modal = document.querySelector('#modal_frame')
-                modal.style.display = "flex";
-
-                modal.addEventListener("click", e => {
-                    modal.style.display = 'none';
-                    $('#modal_frame').empty();
-                })
-            })
-        }
-        
-        # 리펙토링 필요
-        function search() {
-            let search_title = $("#search_area").val();
-            let formData = new FormData
-
-            formData.append("search_title", search_title)
-            fetch('/search', {
-                method: "POST",
-                body: formData
-            }).then((res) => res.json()).then((data) => {
-                $('#cards-box').empty();
-                let webtoon_list = JSON.parse(data['result']);
-                webtoon_list.forEach((web) => {
-                    let webtoon_id = web['_id']['$oid'];
-                    let title = web['title'];
-                    let img = web['image_source'];
-                    let descript = web['description'];
-
-                    let comment_count = web['comment_count'];
-                    let acc_star = web['acc_star'];
-
-                    let ave_star = 0
-                    if (ave_star) {
-                        ave_star = acc_star / comment_count;
-
-                    }
-                    let star = '⭐'
-                    let total_star = star.repeat(ave_star);
-                    let webtoon_card = `<div class="col">
-                                            <div class="card h-100" onclick="webtoon_detail('${webtoon_id}')">
-                                                    <img src="${img}" class="card-img-top">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">${title}</h5>
-                                                        <p> 평점 : ${ave_star} 리뷰: ${comment_count}</p>
-                                                    </div>
-                                            </div>
-                                        </div>`
-
-                    $('#cards-box').append(webtoon_card)
-                })
-            })
-        }
-
-        function open_box() {
-            $('#post-box').show()
-        } // function open_box() end
-
-        function close_box() {
-            $('#post-box').hide()
-        } // function close_box() end
-
+        // function close_box() {
+        //     $('#post-box').hide()
+        // } // function close_box() end
     </script>
 </head>
 
 <body>
     <div class="mytitle">
-
         <!-- 로그인 / 회원가입 페이지로 연결 -->
         <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-bottom: auto; margin-left: auto;">
             <!-- <p class="h6" style="margin-right: 10px; padding-top: 20px;">사용자이름</p> -->
-            <button type="button" class="btn btn-outline-success btn-sm" style="margin-right: 10px; margin-top: 10px;">로그인</button>
-            <button type="button" class="btn btn-outline-danger btn-sm" style="margin-right: 10px; margin-top: 10px;">회원가입</button>
+            <button type="button" class="btn btn-outline-success btn-sm" style="margin-right: 10px; margin-top: 10px;"><a href="/login">로그인</a></button>
+            <button type="button" class="btn btn-outline-danger btn-sm" style="margin-right: 10px; margin-top: 10px;"><a href="/register">회원가입</a></button>
         </div>
         <div class="search-box">
+            <h1 style="margin-bottom: 20px;">Webtooner!</h1>
 
-            <input id="search_area" type="text" placeholder="웹툰 검색" name="query">
-            <button onclick="search()"> 검색 </button>
-
-        <h1 style="margin-bottom: 10px;">Webtooner!</h1>
-
-        <button style="margin-bottom: 50px;" onclick="open_box()">웹툰 등록하기</button>
-    </div>
-
-    <div class="mypost" id="post-box">
-        <div class="form-floating mb-3">
-            <input id="url" type="email" class="form-control" placeholder="name@example.com">
-            <label>웹툰 URL</label>
-        </div>
-        <div class="form-floating">
-            <textarea id="comment" class="form-control" placeholder="Leave a comment here"></textarea>
-            <label for="floatingTextarea2">코멘트</label>
-        </div>
-        <div class="mybtns">
-            <button onclick="posting()" type="button" class="btn btn-dark">등록하기</button>
-            <button onclick="close_box()" type="button" class="btn btn-outline-dark">닫기</button>
-        </div>
+            <input id="search_area" type="text" placeholder="웹툰 검색" name="query" style="margin-bottom: 50px;">
+            <button onclick="search()" style="margin-bottom: 50px;"> 검색 </button>
+            
+        </div> 
     </div>
 
     <div class="mycards">

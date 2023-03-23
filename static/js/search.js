@@ -1,5 +1,12 @@
-function listing() {
-    fetch('/webtoon').then((res) => res.json()).then((data) => {
+function search() {
+    let search_title = $("#search_area").val();
+    let formData = new FormData
+
+    formData.append("search_title", search_title)
+    fetch('/search', {
+        method: "POST",
+        body: formData
+    }).then((res) => res.json()).then((data) => {
         $('#cards-box').empty();
         let webtoon_list = JSON.parse(data['result']);
         webtoon_list.forEach((web) => {
@@ -20,15 +27,15 @@ function listing() {
             let total_star = star.repeat(ave_star);
             let webtoon_card = `<div class="col">
                                     <div class="card h-100" onclick="webtoon_detail('${webtoon_id}')">
-                                        <img src="${img}" class="card-img-top">
-                                        <div class="card-body">
-                                            <h5 class="card-title">${title}</h5>
-                                            <p> 평점 : ${ave_star} 리뷰: ${comment_count}</p>
-                                        </div>
+                                            <img src="${img}" class="card-img-top">
+                                            <div class="card-body">
+                                                <h5 class="card-title">${title}</h5>
+                                                <p> 평점 : ${ave_star} 리뷰: ${comment_count}</p>
+                                            </div>
                                     </div>
                                 </div>`
+
             $('#cards-box').append(webtoon_card)
         })
-
     })
 }
