@@ -31,16 +31,23 @@ def passwordCheck(pwd):
 def home():
     return render_template('index.html')
 
-##### 우상님 작성 내용 #####
-@app.route("/webtoon", methods=["GET"])
+###### 우상님 작성 내용 ######
+@app.route("/webtoon", methods=["GET", "POST"])
+
 def webtoon_get():
-    all_webtoon = list(db.webtoon_list.find())
-    return jsonify({'result' : dumps(all_webtoon)})
+    webtoon = list(db.webtoon_list.find())
+    return jsonify({'result' : dumps(webtoon)})
 
 @app.route("/detail/<string:id>", methods=["GET"])
 def webtoon_detail(id):
     data = db.webtoon_list.find_one({"_id" : ObjectId(id)})
     return jsonify({"result" : dumps(data)})
+
+@app.route("/search", methods=["POST"])
+def webtoon_search():
+    search_keyword = request.form['search_title']
+    webtoon = list(db.webtoon_list.find({'title' : { "$regex" : "^" + search_keyword}}))
+    return jsonify({"result" : dumps(webtoon)})
 
 ##### 상우님 작성 내용 #####
 # 회원가입 페이지
