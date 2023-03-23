@@ -1,0 +1,110 @@
+@charset "utf-8";
+
+* {
+    font-family: 'Gowun Dodum', sans-serif;
+}
+
+.mytitle {
+    width: 100%;
+    height: 250px;
+    background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://movie-phinf.pstatic.net/20210715_95/1626338192428gTnJl_JPEG/movie_image.jpg');
+    background-position: center;
+    background-size: cover;
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.mytitle>button {
+    width: 200px;
+    height: 50px;
+    background-color: transparent;
+    color: white;
+    border-radius: 50px;
+    border: 1px solid white;
+    margin-top: 10px;
+}
+
+.mytitle>div>button>a {
+    color: white;
+    text-decoration: none;
+}
+
+.mytitle>button:hover {
+    border: 2px solid white;
+}
+
+.mycomment {
+    color: gray;
+}
+
+.mycards {
+    margin: 20px auto 0px auto;
+    width: 95%;
+    max-width: 1200px;
+}
+
+.mycards>div>div>div:hover {
+    border: 1px solid black;
+}
+
+.mypost {
+    width: 95%;
+    max-width: 500px;
+    margin: 20px auto 0px auto;
+    padding: 20px;
+    box-shadow: 0px 0px 3px 0px gray;
+
+    display: none;
+}
+
+.mybtns {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 20px;
+}
+
+.mybtns>button {
+    margin-right: 10px;
+}
+
+.modal_frame {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+    display: none;
+}
+
+.modal_window {
+    background: white;
+    backdrop-filter: blur(13.5px);
+    -webkit-backdrop-filter: blur(13.5px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    width: 400px;
+    height: 600px;
+    text-align: center;
+    position: relative;
+    padding: 10px;
+}
+
+.modal_window>div.modal_innerimg {
+    height: 300px;
+    background-position: center;
+    background-size: cover;
+}
