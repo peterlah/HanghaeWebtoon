@@ -32,8 +32,11 @@ pip install bs4
 # pymongo, dnspython 패키지 -> MongoDB 사용을 위한 패키지
 pip install pymongo dnspython
 
+# pip 패키지 통합 설치
+pip install requests flask bs4 pymongo dnspython bson
+
 # 패키지 삭제
-pip uninstall requests
+pip uninstall requests 
 
 ** 파이썬 파일 생성시 import 하는 모듈명과 동일한 이름을 사용하면 문제 발생
 

@@ -1,13 +1,29 @@
-from flask import Flask, render_template, request, jsonify
-app = Flask(__name__)
-
-from pymongo import MongoClient
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from pymongo import MongoClient
 from bson.json_util import dumps
 from bson.objectid import ObjectId
-clinet = MongoClient('mongodb+srv://chunws:test@chunws.w8zkw9b.mongodb.net/?retryWrites=true&w=majority')
-db = clinet.chunws
+import re
+
+app = Flask(__name__)
+client = MongoClient('mongodb+srv://chunws:test@chunws.w8zkw9b.mongodb.net/?retryWrites=true&w=majority')
+db = client.chunws
+
+# 세션을 위한 secret 키 생성
+app.secret_key = "hanghaewebtooner"
+
+# 비밀번호 유효성 검사 함수
+def passwordCheck(pwd):
+    # 글자수 9 ~ 20, 영문 대소문자가 최소 한개씩 포함 필요
+    # findall() 정규식과 매칭 되는 문자열을 리스트 형태로 반환
+    if len(pwd) < 8 or len(pwd) > 21 and not \
+        re.findall('[0-9]+', pwd) and not \
+        re.findall('[a-z]', pwd) or not re.findall('[A-Z]', pwd):
+        return False
+    # 비밀번호에는 최소 1개 이상의 특수 문자가 포함되어야 함
+    elif not re.findall('[`~!@#$%^&*(),<.>/?]+', pwd):
+        return False
+    # 유효성 검사를 통과하면 True 값 반환
+    return True
 
 # index.html
 @app.route('/', methods=["GET"])
@@ -40,6 +56,11 @@ def register_post():
     # 패스워드 검사
     if pw_register_receive != pw_check_receive:
         return jsonify({'msg': '비밀번호가 일치하지 않습니다.'})
+
+    # 패스워드 유효성 검사
+    pswd_logic = passwordCheck(pw_register_receive)
+    if pswd_logic != True:
+        return jsonify({'msg': '비밀번호에는 최소 한개 이상의 특수문자, 영문 대소문자가 포함되어야 하며, 9~20자 사이여야 합니다.'})
 
     # 아이디 존재 여부 확인
     if user is not None:
@@ -77,7 +98,15 @@ def login_post():
     if user.get('password') != pw_receive:
         return jsonify({'msg': '비밀번호가 일치하지 않습니다.'})
     else:
-    	return jsonify({'msg': 'login 성공!'})
+        # 세션 정보 등록
+        session["username"] = user_receive
+        session["password"] = pw_receive
+        session["id"] = str(user.get("_id"))
+        
+        # 세션 유지 시간 설정
+        session.permanent = True
+        
+        return jsonify({'msg': 'login 성공!'})
 
 @app.route("/login", methods=["GET"])
 def login_get():

@@ -17,7 +17,6 @@
         * {
             font-family: 'Gowun Dodum', sans-serif;
         }
-
         
         .mytitle {
             width: 100%;
@@ -43,7 +42,7 @@
             margin-top: 10px;
         }
         
-        .mytitle>div>button {
+        /* .mytitle>div>button {
             width: 150px;
             height: 50px;
             background-color: transparent;
@@ -52,7 +51,7 @@
             border: 1px solid white;
             margin-top: 10px;
             margin-left: 10px;
-        }
+        } */
         
         .mytitle>div>button>a {
             color: white;
@@ -217,16 +216,20 @@
 
 <body>
     <div class="mytitle">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-bottom: auto; margin-left: auto;">
+            <!-- <p class="h6" style="margin-right: 10px; padding-top: 20px;">사용자이름</p> -->
+            <button type="button" class="btn btn-outline-success btn-sm" style="margin-right: 10px; margin-top: 10px;">로그인</button>
+            <button type="button" class="btn btn-outline-danger btn-sm" style="margin-right: 10px; margin-top: 10px;">회원가입</button>
+        </div>
+        <h1 style="margin-bottom: 30px;">Webtooner!</h1>
 
-        <h1>Webtooner!</h1>
-
-        <button onclick="open_box()">음악 등록하기</button>
+        <button style="margin-bottom: 50px;" onclick="open_box()">웹툰 등록하기</button>
 
         <!-- 로그인 / 회원가입 페이지로 연결 -->
-        <div style="display:inline">
+        <!-- <div style="display:inline">
             <button> <a href="/login"> 로그인 </a> </button>
             <button> <a href="/register"> 회원가입 </a> </button>
-        </div>
+        </div> -->
 
     </div>
     <div class="mypost" id="post-box">
