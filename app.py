@@ -2,7 +2,9 @@ from flask import Flask, render_template, request, jsonify, session
 from pymongo import MongoClient
 from bson.json_util import dumps
 from bson.objectid import ObjectId
+from bs4 import BeautifulSoup
 import re
+import requests
 
 app = Flask(__name__)
 client = MongoClient('mongodb+srv://chunws:test@chunws.w8zkw9b.mongodb.net/?retryWrites=true&w=majority')
@@ -25,12 +27,11 @@ def passwordCheck(pwd):
     # 유효성 검사를 통과하면 True 값 반환
     return True
 
-# index.html
-@app.route('/', methods=["GET"])
+@app.route('/')
 def home():
     return render_template('index.html')
 
-###### 우상님 작성 내용 ######
+##### 우상님 작성 내용 #####
 @app.route("/webtoon", methods=["GET"])
 def webtoon_get():
     all_webtoon = list(db.webtoon_list.find())
@@ -107,7 +108,38 @@ def login_post():
 @app.route("/login", methods=["GET"])
 def login_get():
     return render_template('login.html')
+    
+##### 보슬님 작성 내용 #####
+# /webtoon -> /mypage로 수정, 함수명 변경
+@app.route("/mypage", methods=["POST"])
+def mypage_post():
+    url_receive = request.form['url_give']
+    comment_receive = request.form['comment_give']
+    
+    headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+    data = requests.get(url_receive,headers=headers)
 
+    soup = BeautifulSoup(data.text, 'html.parser')
+
+    ogtitle = soup.select_one('meta[property="og:title"]')['content']
+    ogdesc = soup.select_one('meta[property="og:description"]')['content']
+    ogimage = soup.select_one('meta[property="og:image"]')['content']
+  
+    doc = {
+        'title':ogtitle,
+        'desc':ogdesc,
+        'image':ogimage,
+        'comment':comment_receive,
+    }
+    # collection 명 수정(webtoon->mywebtoon)
+    db.mywebtoon.insert_one(doc)
+            
+    return jsonify({'msg':'POST 등록완료!'})
+
+# /webtoon -> /mypage로 수정, 함수명 
+@app.route("/mypage", methods=["GET"])
+def mypage_get():
+    return jsonify({'msg':'GET 연결 완료!'})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)
