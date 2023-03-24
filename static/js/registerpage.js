@@ -11,15 +11,15 @@ function register_page() {
                                     <form method="POST" action="./register">
                                         <div class="form-group" style="margin-top: 10px;">
                                             <label for="user" style="margin-left: 3px;">아이디</label>
-                                            <input type="text" class="form-control" id="user" placeholder="아이디" name="user" />
+                                            <input type="text" class="form-control" id="registeruser" placeholder="아이디" name="registeruser" />
                                         </div>
                                         <div class="form-group" style="margin-top: 10px;">
                                             <label for="email" style="margin-left: 3px;">이메일</label>
-                                            <input type="email" class="form-control" id="email" placeholder="이메일" name="email" />
+                                            <input type="email" class="form-control" id="registeremail" placeholder="이메일" name="registeremail" />
                                         </div>
                                         <div class="form-group" style="margin-top: 10px;">
                                             <label for="password" style="margin-left: 3px;">비밀번호</label>
-                                            <input type="password" class="form-control" id="password" placeholder="비밀번호" name="password" />
+                                            <input type="password" class="form-control" id="registerpassword" placeholder="비밀번호" name="registerpassword" />
                                         </div>
                                         <div class="form-group" style="margin-top: 10px;">
                                             <label for="re_password" style="margin-left: 3px;">비밀번호 확인</label>
@@ -35,4 +35,3 @@ function register_page() {
                         </div>`
     $('#cards-box').append(register_box)
 }
-

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from pymongo import MongoClient
 from bson.json_util import dumps
 from bson.objectid import ObjectId
@@ -14,12 +14,15 @@ db = client.chunws
 app.secret_key = "hanghaewebtooner"
 
 # 비밀번호 유효성 검사 함수
-def passwordCheck(pwd):
+def passwordCheck(pw_register_receive):
+    pwd = pw_register_receive
+    print(pwd)
     # 글자수 9 ~ 20, 영문 대소문자가 최소 한개씩 포함 필요
     # findall() 정규식과 매칭 되는 문자열을 리스트 형태로 반환
     if len(pwd) < 8 or len(pwd) > 21 and not \
         re.findall('[0-9]+', pwd) and not \
-        re.findall('[a-z]', pwd) or not re.findall('[A-Z]', pwd):
+        re.findall('[a-z]', pwd) or not \
+        re.findall('[A-Z]', pwd):
         return False
     # 비밀번호에는 최소 1개 이상의 특수 문자가 포함되어야 함
     elif not re.findall('[`~!@#$%^&*(),<.>/?]+', pwd):
@@ -50,39 +53,55 @@ def webtoon_search():
 
 ##### 상우님 작성 내용 #####
 # 회원가입 페이지
-@app.route("/register", methods=["POST"])
+@app.route("/register", methods=["POST", "GET"])
 def register_post():
-    user_register_receive = request.form.get('user')
-    email_register_receive = request.form.get('email')
-    pw_register_receive = request.form.get('password')
-    pw_check_receive = request.form.get('re_password')
+    if request.method == 'POST':
+        try:
+            user_receive = request.form['registeruser']
+            email_receive = request.form['registeremail']
+            pw_receive = request.form['registerpassword']
+            pw_check = request.form['re_password']
+        
+        except KeyError:    
+            return jsonify({'msg': '양식을 모두 작성해주세요!', "status" : False})
+        
+        # 디비에서 해당 아이디의 사용자 정보를 조회
+        user = db.user.find_one({'username': user_receive})
 
-    # 디비에서 해당 아이디의 사용자 정보를 조회
-    user = db.user.find_one({'username': user_register_receive})
+        # 패스워드 유효성 검사 True면 유효 False면 유효하지 않음
+        pswd_logic = passwordCheck(pw_receive)
 
-    # 패스워드 유효성 검사 True면 유효 False면 유효하지 않음
-    pswd_logic = passwordCheck(pw_register_receive)
+        # 패스워드 검사
+        if pw_receive != pw_check:
+            msg = "비밀번호가 일치하지 않습니다."
+            return jsonify({'msg' : msg , 'status' : False})
+        
+        elif pswd_logic != True:
+            msg = '비밀번호에는 최소 한개 이상의 특수문자, 영문 대소문자가 포함되어야 하며, 9~20자 사이여야 합니다.'
+            return jsonify({'msg': msg, 'status' : False})
+        
+        elif user is not None: # 아이디 존재 여부 확인
+            msg = '존재하는 아이디 입니다.'
+            return jsonify({'msg': msg, 'status' : False})
+        
+        else:
+            doc = {
+                'username': user_receive,
+                'mail': email_receive,
+                'password': pw_receive
+            }
 
-    # 패스워드 검사
-    if pw_register_receive != pw_check_receive:
-        return jsonify({'msg': '비밀번호가 일치하지 않습니다.'})
-    elif pswd_logic != True:
-        return jsonify({'msg': '비밀번호에는 최소 한개 이상의 특수문자, 영문 대소문자가 포함되어야 하며, 9~20자 사이여야 합니다.'})
-    elif user is not None: # 아이디 존재 여부 확인
-        return jsonify({'msg': '존재하는 아이디 입니다.'})
+            db.user.insert_one(doc)
+            msg = '회원가입 완료!'
+            
+            return jsonify({'msg':msg, 'status' : True})
+    
     else:
-        doc = {
-            'username': user_register_receive,
-            'mail': email_register_receive,
-            'password': pw_register_receive
-        }
-
-        db.user.insert_one(doc)
-        return jsonify({'msg':'회원가입 완료!'})
-
-@app.route("/register", methods=["GET"])
-def register_get():
-    return render_template('register.html')
+        return render_template('register.html')
+        
+# @app.route("/register", methods=["GET"])
+# def register_get():
+#     return render_template('register.html')
 
 # 로그인 페이지
 @app.route("/login", methods=["POST"])
