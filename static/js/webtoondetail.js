@@ -7,20 +7,19 @@ function webtoon_detail(id) {
 
         let scroll = document.documentElement.scrollTop;
         let window = `
-                    <div class="modal_window">
+                    <div id="modal_window" class="modal_window">
                         <div class='modal_innerimg' style = "background-image : url('${select_img}')"";>
                         </div>
                         <h5> ${select_title} </h5>
                         <p> ${select_des} <p>
                     </div>`
-        console.log(scroll)
         $('#modal_frame').append(window)
         let modal = document.querySelector('#modal_frame')
         modal.style.display = "flex";
 
         modal.addEventListener("click", e => {
             modal.style.display = 'none';
-            $('#modal_frame').empty();
+            $("#modal_frame").empty();
         })
     })
 }
