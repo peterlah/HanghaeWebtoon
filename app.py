@@ -7,8 +7,8 @@ import re
 import requests
 
 app = Flask(__name__)
-client = MongoClient('mongodb+srv://swlah:zbqm0621@cluster0.g93fmw7.mongodb.net/?retryWrites=true&w=majority')
-db = client.webtoon
+client = MongoClient('mongodb+srv://chunws:test@chunws.w8zkw9b.mongodb.net/?retryWrites=true&w=majority')
+db = client.chunws
 
 # 세션을 위한 secret 키 생성
 app.secret_key = "hanghaewebtooner"
@@ -132,7 +132,7 @@ def login_post():
         return render_template('login.html')
 
 # 로그아웃    
-@app.route('/logout')
+@app.route('/logout', methods=["POST"])
 def logout():
     # 세션 제거
     session.pop('username', None)
@@ -178,7 +178,10 @@ def mypage_post():
 # 마이페이지 get
 @app.route("/mypage", methods=["GET"])
 def mypage_get():
-    return render_template('mypage.html')
+    if 'username' in session:
+        return render_template('mypage.html')
+    else:
+        return jsonify({'msg':'다시 로그인 해주세요.!'})
 
 @app.route("/mypage/list", methods=["GET"])
 def mypage_list_get():
