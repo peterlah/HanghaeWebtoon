@@ -8,7 +8,7 @@ function register_page() {
 
                                 <div class="col-12" >
                                     <!-- Form 테그 https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=heartflow89&logNo=221159929166 -->
-                                    <form method="POST" action="./register">
+                                    <form method="POST" action="/register">
                                         <div class="form-group" style="margin-top: 10px;">
                                             <label for="user" style="margin-left: 3px;">아이디</label>
                                             <input type="text" class="form-control" id="registeruser" placeholder="아이디" name="registeruser" />
@@ -27,7 +27,7 @@ function register_page() {
                                                 name="re_password" />
                                         </div>
                                         <div style="display: flex;">
-                                            <button onclick="register()" type="submit" class="btn btn-primary" style="margin-top: 10px; margin-left: auto;">제출</button>
+                                            <button onclick="register()" type="submit" class="btn btn-primary" style="margin-top: 10px; margin-left: auto;">회원가입</button>
                                         </div>
                                     </form>
                                 </div>

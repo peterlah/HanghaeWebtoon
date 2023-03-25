@@ -1,15 +1,22 @@
 function login() {
-    let user = $('#user').val()
-    let pw = $('#password').val()
+    let loginUser = $('#loginuser').val()
+    let loginPassword= $('#loginpassword').val()
 
     let formData = new FormData();
 
-    formData.append("user_give", user);
-    formData.append("pw_give", pw);
+    formData.append("loginuser", loginUser);
+    formData.append("loginpassword", loginPassword);
 
     fetch('/login', {method: "POST", body: formData }).then((res) => res.json()).then((data) => {
-        console.log(data);
-        alert(data['msg'])
-        window.location.reload()
+        let status = data['status'];
+        let message = data['msg'];
+
+        alert(message)
+
+        if (status) {
+            location.href = '/mypage';
+        } else {
+            location.href = '/login';
+        }
     })
 }

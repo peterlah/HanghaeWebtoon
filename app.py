@@ -7,8 +7,8 @@ import re
 import requests
 
 app = Flask(__name__)
-client = MongoClient('mongodb+srv://chunws:test@chunws.w8zkw9b.mongodb.net/?retryWrites=true&w=majority')
-db = client.chunws
+client = MongoClient('mongodb+srv://swlah:zbqm0621@cluster0.g93fmw7.mongodb.net/?retryWrites=true&w=majority')
+db = client.webtoon
 
 # 세션을 위한 secret 키 생성
 app.secret_key = "hanghaewebtooner"
@@ -16,7 +16,6 @@ app.secret_key = "hanghaewebtooner"
 # 비밀번호 유효성 검사 함수
 def passwordCheck(pw_register_receive):
     pwd = pw_register_receive
-    print(pwd)
     # 글자수 9 ~ 20, 영문 대소문자가 최소 한개씩 포함 필요
     # findall() 정규식과 매칭 되는 문자열을 리스트 형태로 반환
     if len(pwd) < 8 or len(pwd) > 21 and not \
@@ -34,25 +33,26 @@ def passwordCheck(pw_register_receive):
 def home():
     return render_template('index.html')
 
-###### 우상님 작성 내용 ######
+# 메인 페이지
 @app.route("/webtoon", methods=["GET", "POST"])
 def webtoon_get():
     webtoon = list(db.webtoon_list.find())
     return jsonify({'result' : dumps(webtoon)})
 
+# 상세 정보
 @app.route("/detail/<string:id>", methods=["GET"])
 def webtoon_detail(id):
     data = db.webtoon_list.find_one({"_id" : ObjectId(id)})
     return jsonify({"result" : dumps(data)})
 
+# 검색
 @app.route("/search", methods=["POST"])
 def webtoon_search():
     search_keyword = request.form['search_title']
     webtoon = list(db.webtoon_list.find({'title' : { "$regex" : "^" + search_keyword}}))
     return jsonify({"result" : dumps(webtoon)})
 
-##### 상우님 작성 내용 #####
-# 회원가입 페이지
+# 회원가입
 @app.route("/register", methods=["POST", "GET"])
 def register_post():
     if request.method == 'POST':
@@ -98,73 +98,99 @@ def register_post():
     
     else:
         return render_template('register.html')
-        
-# @app.route("/register", methods=["GET"])
-# def register_get():
-#     return render_template('register.html')
 
-# 로그인 페이지
-@app.route("/login", methods=["POST"])
+# 로그인
+@app.route("/login", methods=["POST", "GET"])
 def login_post():
-    user_receive = request.form.get('user_give')
-    pw_receive = request.form.get('pw_give')
-    
-    # 디비에서 해당 아이디의 사용자 정보를 조회
-    user = db.user.find_one({'username': user_receive})
-    
-    # 아이디 존재 여부 확인
-    if user is None:
-        return jsonify({'msg': '존재하지 않는 사용자입니다.'})
-    
-    # 비밀번호 일치 여부 확인
-    if user.get('password') != pw_receive:
-        return jsonify({'msg': '비밀번호가 일치하지 않습니다.'})
+    if request.method == 'POST':
+        try:
+            user_receive = request.form['loginuser']
+            pw_receive = request.form['loginpassword']
+
+        except KeyError:
+            return jsonify({'msg': '양식을 모두 작성해주세요!', 'status' : False})
+        
+        # 디비에서 해당 아이디의 사용자 정보를 조회
+        user = db.user.find_one({'username': user_receive})
+
+        # 아이디 존재 여부 확인
+        if user is None:
+            msg = "존재하지 않는 사용자입니다."
+            return jsonify({'msg': msg, 'status' : False})
+        
+        # 비밀번호 일치 여부 확인
+        if user['password'] != pw_receive:
+            msg = "비밀번호가 일치하지 않습니다."
+            return jsonify({'msg': msg, 'status' : False})
+        
+        else:
+            # 세션 정보 등록
+            session["username"] = user_receive
+            msg = "login 성공!"           
+            return jsonify({'msg': msg, 'status' : True})
     else:
-        # 세션 정보 등록
-        session["username"] = user_receive
-        session["password"] = pw_receive
-        session["id"] = str(user.get("_id"))
+        return render_template('login.html')
+
+# 로그아웃    
+@app.route('/logout')
+def logout():
+    # 세션 제거
+    session.pop('username', None)
+    msg = "로그아웃!"
+    return jsonify({'msg' : msg, 'status': True })
+
+# 마이페이지 Post
+@app.route("/mypage", methods=["POST"])
+def mypage_post():
+    if 'username' in session:
+        url_receive = request.form['url_give']
+        comment_receive = request.form['comment_give']
+        star_receive = request.form['star_give']
         
-        # 세션 유지 시간 설정
-        session.permanent = True
-        
-        return jsonify({'msg': 'login 성공!'})
+        headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+        data = requests.get(url_receive,headers=headers)
 
-@app.route("/login", methods=["GET"])
-def login_get():
-    return render_template('login.html')
+        soup = BeautifulSoup(data.text, 'html.parser')
+
+        ogtitle = soup.select_one('meta[property="og:title"]')['content']
+        ogdesc = soup.select_one('meta[property="og:description"]')['content']
+        ogimage = soup.select_one('meta[property="og:image"]')['content']
     
-##### 보슬님 작성 내용 #####
-# # /webtoon -> /mypage로 수정, 함수명 변경
-# @app.route("/mypage", methods=["POST"])
-# def mypage_post():
-#     url_receive = request.form['url_give']
-#     comment_receive = request.form['comment_give']
+        doc = {
+            'title':ogtitle,
+            'desc':ogdesc,
+            'image':ogimage,
+            'star': star_receive,
+            'comment':comment_receive,
+        }
+
+        db.mywebtoon.insert_one(doc)
+                
+        # 데이터 검색 및 전용 value 값 넣어주기
+        data = str(db.mywebtoon.find_one(doc)['_id'])
+        db.mywebtoon.update_one(doc,{'$set':{'id':data}})
+
+        return jsonify({'msg':'저장완료!'})
     
-#     headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
-#     data = requests.get(url_receive,headers=headers)
+    else:
+        return jsonify({'msg':'다시 로그인 해주세요.!'})
 
-#     soup = BeautifulSoup(data.text, 'html.parser')
+# 마이페이지 get
+@app.route("/mypage", methods=["GET"])
+def mypage_get():
+    return render_template('mypage.html')
 
-#     ogtitle = soup.select_one('meta[property="og:title"]')['content']
-#     ogdesc = soup.select_one('meta[property="og:description"]')['content']
-#     ogimage = soup.select_one('meta[property="og:image"]')['content']
-  
-#     doc = {
-#         'title':ogtitle,
-#         'desc':ogdesc,
-#         'image':ogimage,
-#         'comment':comment_receive,
-#     }
-#     # collection 명 수정(webtoon->mywebtoon)
-#     db.mywebtoon.insert_one(doc)
-            
-#     return jsonify({'msg':'POST 등록완료!'})
+@app.route("/mypage/list", methods=["GET"])
+def mypage_list_get():
+    all_webtoon = list(db.mywebtoon.find({},{'_id':False}))
+    return jsonify({'result': all_webtoon})
 
-# # /webtoon -> /mypage로 수정, 함수명 
-# @app.route("/mypage", methods=["GET"])
-# def mypage_get():
-#     return jsonify({'msg':'GET 연결 완료!'})
+@app.route("/mypage/delete", methods=["POST"])
+def movie_delete():
+    id_receive = request.form['id_give']
+    db.mywebtoon.delete_one({'id':id_receive})
+
+    return jsonify({'msg':'삭제 완료!'})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)

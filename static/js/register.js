@@ -23,20 +23,4 @@ function register() {
             location.href = '/register';
         }
     })
-
-    // fetch('/register', { method: 'POST', body: formData }).then((res) => {
-    //     return res.json()
-    // }).then((data) => {
-
-    //     let status = data['status'];
-    //     let message = data['msg'];
-
-    //     alert(message)
-
-    //     if (status) {
-    //         location.href = '/login';
-    //     } else {
-    //         location.href = '/register';
-    //     }
-    // })
 }
