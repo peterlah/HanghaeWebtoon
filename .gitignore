@@ -1,3 +1,5 @@
 venv/*
+deploy/*
 webtoon.py
 CRUD.py
+test.py
